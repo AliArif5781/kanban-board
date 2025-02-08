@@ -18,9 +18,12 @@ import {
   DragEndEvent,
   DragStartEvent,
   useDroppable,
+  TouchSensor,
 } from "@dnd-kit/core";
 import {
+  horizontalListSortingStrategy,
   SortableContext,
+  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableItem } from "./SortableItem"; // Create this component (see below)
@@ -40,8 +43,20 @@ const ContainerBox = () => {
 
   // Sensors for drag-and-drop
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor)
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   );
 
   // Handle drag start
@@ -130,7 +145,7 @@ const ContainerBox = () => {
                     >
                       {each.task.map((task) => (
                         <SortableItem key={task.id} id={task.id}>
-                          <div className="bg-gray-300 font-medium capitalize rounded-md p-2 hover:shadow-md transition-all ease-in-out duration-300 cursor-grab">
+                          <div className="bg-gray-300 font-medium capitalize rounded-md p-2 hover:shadow-md transition-all ease-in-out duration-300 cursor-grab touch-none">
                             {task.value}
                           </div>
                         </SortableItem>
