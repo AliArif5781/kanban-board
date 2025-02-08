@@ -1,50 +1,37 @@
-# React + TypeScript + Vite
+## DragTrack - A Kanban Board for Drag and Drop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DragTrack is a simple Kanban board that allows you to drag and drop tasks between columns. It is built using:
 
-Currently, two official plugins are available:
+- React
+- DnD-Kit
+- TypeScript
+- Tailwind CSS
+- Lucide Icons (for the icons)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 👾 Features
 
-## Expanding the ESLint configuration
+- Drag and drop containers.
+- Delete containers and items.
+- Drag and drop items between containers.
+- Add items are draggable.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 📒 Process
 
-- Configure the top-level `parserOptions` property like this:
+I started by implementing the functionality for creating containers. Next, I added the ability to drag and drop containers. Afterwards, I focused on the capability to create items inside containers and further, to drag and drop them.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Then I styled the board, drawing inspiration from modern Kanban boards like Notion based on my experience.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Subsequently, I added functionalities for deleting items and containers. I then implemented the ability to edit the names of containers and items. Lastly, I added an indication of which container you are editing items in. Afterward, I performed some small refactoring and styling touch-ups.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Some features were added in between the main features development. Everything is saved in local storage. The user can come back, and everything will still be there.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+**NOTE:** The project's purpose is to demonstrate the use of DnD-Kit and TypeScript. It is not meant to be a full-fledged Kanban board.
+
+## 🚦 Running the Project
+
+To run the project in your local environment, follow these steps:
+
+1. Clone the repository to your local machine.
+2. Run `npm install` or `yarn` in the project directory to install the required dependencies.
+3. Run `npm run start` or `yarn start` to get the project started.
+4. Open [http://localhost:5173](http://localhost:5173) (or the address shown in your console) in your web browser to view the app.
