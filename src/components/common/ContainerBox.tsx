@@ -21,7 +21,6 @@ import {
   TouchSensor,
 } from "@dnd-kit/core";
 import {
-  horizontalListSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
