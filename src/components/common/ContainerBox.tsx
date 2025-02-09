@@ -164,7 +164,7 @@ const ContainerBox = () => {
                   {/* Content Area */}
                   <div className="flex-1 space-y-4 py-2">
                     <SortableContext
-                      items={each.task.map((task, index) => task.id)}
+                      items={each.task.map((task) => task.id)}
                       strategy={verticalListSortingStrategy}
                     >
                       {each.task.map((task, index) => (
