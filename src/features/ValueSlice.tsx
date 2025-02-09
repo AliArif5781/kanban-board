@@ -83,34 +83,41 @@ export const ValueSlice = createSlice({
         }
       }
     },
-    moveTask: (state, action) => {
-      const { fromContainerId, toContainerId, taskId, newIndex } =
-        action.payload;
-      const fromContainer = state.containerInputValue.find(
-        (container) => container.id === fromContainerId
+    moveTask: (
+      state,
+      action: PayloadAction<{
+        taskId: string;
+        sourceContainerId: string;
+        destinationContainerId: string;
+        destinationIndex: number;
+      }>
+    ) => {
+      const {
+        taskId,
+        sourceContainerId,
+        destinationContainerId,
+        destinationIndex,
+      } = action.payload;
+
+      const sourceContainer = state.containerInputValue.find(
+        (c) => c.id === sourceContainerId
       );
-      const toContainer = state.containerInputValue.find(
-        (container) => container.id === toContainerId
+      const destinationContainer = state.containerInputValue.find(
+        (c) => c.id === destinationContainerId
       );
 
-      if (fromContainer && toContainer) {
-        const taskIndex = fromContainer.task.findIndex(
-          (task) => task.id === taskId
-        );
-        const task = fromContainer.task[taskIndex];
+      if (!sourceContainer || !destinationContainer) return;
 
-        // Remove task from the source container
-        fromContainer.task.splice(taskIndex, 1);
+      const taskIndex = sourceContainer.task.findIndex((t) => t.id === taskId);
+      if (taskIndex === -1) return;
 
-        // Add task to the target container at the new index
-        toContainer.task.splice(newIndex, 0, task);
+      const [task] = sourceContainer.task.splice(taskIndex, 1);
+      destinationContainer.task.splice(destinationIndex, 0, task);
 
-        // Update localStorage with the new state
-        localStorage.setItem(
-          "addContainer",
-          JSON.stringify(state.containerInputValue)
-        );
-      }
+      localStorage.setItem(
+        "addContainer",
+        JSON.stringify(state.containerInputValue)
+      );
     },
   },
 });
