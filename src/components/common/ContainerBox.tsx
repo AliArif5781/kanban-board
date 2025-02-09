@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { RootState } from "../../app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { EllipsisVertical } from "lucide-react";
-import { deleteContainer, moveTask } from "../../features/ValueSlice";
+import {
+  ContainerItem,
+  deleteContainer,
+  moveTask,
+} from "../../features/ValueSlice";
 import {
   itemValueDialogs,
   setCurrentContainerId,
@@ -69,31 +73,6 @@ const ContainerBox = () => {
     }
   };
 
-  // Handle drag end
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeContainer = containerValue.find((container) =>
-      container.task.some((task) => task.id === active.id)
-    );
-    const overContainer = containerValue.find(
-      (container) => container.id === over.id
-    );
-
-    if (activeContainer && overContainer) {
-      dispatch(
-        moveTask({
-          fromContainerId: activeContainer.id,
-          toContainerId: overContainer.id,
-          taskId: active.id as string,
-          newIndex: 0, // Add to the beginning of the empty container
-        })
-      );
-    }
-    setActiveTask(null);
-  };
-
   // Handle click on the Plus icon
   const handlePlusClick = (id: string) => {
     setOpenMenuId(openMenuId === id ? null : id); // Toggle menu
@@ -108,6 +87,52 @@ const ContainerBox = () => {
     dispatch(itemValueDialogs(true));
     dispatch(setCurrentContainerId(id));
     setOpenMenuId(null);
+  };
+
+  // ContainerBox.tsx
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
+
+    if (active.data.current?.type !== "task") return;
+
+    const sourceContainer = containerValue.find((cont) =>
+      cont.task.some((task) => task.id === activeId)
+    );
+    if (!sourceContainer) return;
+
+    let destinationContainer: ContainerItem | undefined;
+    let destinationIndex: number;
+
+    if (over.data.current?.type === "container") {
+      destinationContainer = containerValue.find((cont) => cont.id === overId);
+      if (!destinationContainer) return;
+      destinationIndex = destinationContainer.task.length;
+    } else if (over.data.current?.type === "task") {
+      destinationContainer = containerValue.find((cont) =>
+        cont.task.some((task) => task.id === overId)
+      );
+      if (!destinationContainer) return;
+
+      const overIndex = over.data.current.sortable.index;
+      const isBelow = active.rect.current.translated?.top! > over.rect.top;
+      destinationIndex = isBelow ? overIndex + 1 : overIndex;
+    } else {
+      return;
+    }
+
+    dispatch(
+      moveTask({
+        taskId: activeId,
+        sourceContainerId: sourceContainer.id,
+        destinationContainerId: destinationContainer.id,
+        destinationIndex,
+      })
+    );
   };
 
   return (
@@ -139,12 +164,12 @@ const ContainerBox = () => {
                   {/* Content Area */}
                   <div className="flex-1 space-y-4 py-2">
                     <SortableContext
-                      items={each.task.map((task) => task.id)}
+                      items={each.task.map((task, index) => task.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      {each.task.map((task) => (
-                        <SortableItem key={task.id} id={task.id}>
-                          <div className="bg-gray-300 font-medium capitalize rounded-md p-2 hover:shadow-md transition-all ease-in-out duration-300 cursor-grab touch-none">
+                      {each.task.map((task, index) => (
+                        <SortableItem key={task.id} id={task.id} index={index}>
+                          <div className="bg-gray-300 font-medium capitalize rounded-md p-2 hover:shadow-md transition-all ease-in-out duration-300">
                             {task.value}
                           </div>
                         </SortableItem>
@@ -188,7 +213,6 @@ const ContainerBox = () => {
   );
 };
 
-// DroppableContainer Component
 const DroppableContainer = ({
   id,
   children,
@@ -196,13 +220,14 @@ const DroppableContainer = ({
   id: string;
   children: React.ReactNode;
 }) => {
-  const { setNodeRef } = useDroppable({ id });
+  const { setNodeRef } = useDroppable({
+    id,
+    data: {
+      type: "container",
+    },
+  });
 
-  return (
-    <div ref={setNodeRef} className="w-full">
-      {children}
-    </div>
-  );
+  return <div ref={setNodeRef}>{children}</div>;
 };
 
 export default ContainerBox;
